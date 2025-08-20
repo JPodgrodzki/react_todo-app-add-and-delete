@@ -83,13 +83,12 @@ export const App: React.FC = () => {
       const createdTodo = await addTodo(trimmedTitle);
 
       setTodos(current => [...current, createdTodo]);
+      setNewTodoTitle('');
     } catch {
       setError(Errors.Add);
     } finally {
       setTempTodo(null);
     }
-
-    setNewTodoTitle('');
   };
 
   const handleDelete = async (id: number) => {
