@@ -153,7 +153,7 @@ export const App: React.FC = () => {
           handleSubmit={handleSubmit}
           setNewTodoTitle={setNewTodoTitle}
           newTodoTitle={newTodoTitle}
-          tempTodo={tempTodo}
+          disabled={!!tempTodo}
           inputRef={inputRef}
         />
 
@@ -162,7 +162,7 @@ export const App: React.FC = () => {
             return (
               <TodoItem
                 todo={todo}
-                deleteTodoIds={deleteTodoIds}
+                isActive={deleteTodoIds.includes(todo.id)}
                 handleDelete={handleDelete}
                 key={todo.id}
               />

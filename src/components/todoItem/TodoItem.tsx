@@ -1,17 +1,14 @@
 import React from 'react';
 import { Todo } from '../../types/Todo';
+import classNames from 'classnames';
 
 type Props = {
   todo: Todo;
-  deleteTodoIds: number[];
+  isActive: boolean;
   handleDelete: (arg0: number) => {};
 };
 
-export const TodoItem: React.FC<Props> = ({
-  todo,
-  deleteTodoIds,
-  handleDelete,
-}) => {
+export const TodoItem: React.FC<Props> = ({ todo, isActive, handleDelete }) => {
   return (
     <div
       key={todo.id}
@@ -45,7 +42,7 @@ export const TodoItem: React.FC<Props> = ({
 
       <div
         data-cy="TodoLoader"
-        className={`modal overlay ${deleteTodoIds.includes(todo.id) && 'is-active'}`}
+        className={classNames('modal', 'overlay', isActive && 'is-active')}
       >
         {/* eslint-disable-next-line max-len */}
         <div className="modal-background has-background-white-ter" />

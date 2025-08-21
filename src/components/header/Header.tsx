@@ -1,11 +1,10 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { Todo } from '../../types/Todo';
 
 type Props = {
   handleSubmit: (event: React.FormEvent) => {};
   setNewTodoTitle: Dispatch<SetStateAction<string>>;
   newTodoTitle: string;
-  tempTodo: Todo | null;
+  disabled: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
 };
 
@@ -13,7 +12,7 @@ export const Header: React.FC<Props> = ({
   handleSubmit,
   setNewTodoTitle,
   newTodoTitle,
-  tempTodo,
+  disabled,
   inputRef,
 }) => {
   return (
@@ -34,7 +33,7 @@ export const Header: React.FC<Props> = ({
           placeholder="What needs to be done?"
           value={newTodoTitle}
           onChange={event => setNewTodoTitle(event.target.value)}
-          disabled={!!tempTodo}
+          disabled={disabled}
           autoFocus
           ref={inputRef}
         />
