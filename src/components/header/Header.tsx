@@ -1,20 +1,18 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
 
 type Props = {
-  handleSubmit: (event: React.FormEvent) => {};
-  setNewTodoTitle: Dispatch<SetStateAction<string>>;
-  newTodoTitle: string;
+  handleSubmit: (query: string) => Promise<boolean>;
   disabled: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
 };
 
 export const Header: React.FC<Props> = ({
   handleSubmit,
-  setNewTodoTitle,
-  newTodoTitle,
   disabled,
   inputRef,
 }) => {
+  const [query, setQuery] = useState('');
+
   return (
     <header className="todoapp__header">
       {/* this button should have `active` class only if all todos are completed */}
@@ -25,14 +23,24 @@ export const Header: React.FC<Props> = ({
       />
 
       {/* Add a todo on form submit */}
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={async event => {
+          event.preventDefault();
+
+          const success = await handleSubmit(query);
+
+          if (success) {
+            setQuery('');
+          }
+        }}
+      >
         <input
           data-cy="NewTodoField"
           type="text"
           className="todoapp__new-todo"
           placeholder="What needs to be done?"
-          value={newTodoTitle}
-          onChange={event => setNewTodoTitle(event.target.value)}
+          value={query}
+          onChange={event => setQuery(event.target.value)}
           disabled={disabled}
           autoFocus
           ref={inputRef}

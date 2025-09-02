@@ -8,13 +8,13 @@ import { Errors } from './types/Errors';
 import { UserWarning } from './UserWarning';
 import { TodoItem } from './components/todoItem/TodoItem';
 import { Header } from './components/header/Header';
+import classNames from 'classnames';
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Errors | null>(null);
   const [filter, setFilter] = useState<Filter>(Filter.All);
-  const [newTodoTitle, setNewTodoTitle] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [deleteTodoIds, setDeleteTodoIds] = useState<number[]>([]);
 
@@ -59,15 +59,13 @@ export const App: React.FC = () => {
     }
   }, [tempTodo]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    const trimmedTitle = newTodoTitle.trim();
+  const handleSubmit = async (query: string): Promise<boolean> => {
+    const trimmedTitle = query.trim();
 
     if (!trimmedTitle) {
       setError(Errors.Title);
 
-      return;
+      return false;
     }
 
     const newTempTodo: Todo = {
@@ -83,9 +81,12 @@ export const App: React.FC = () => {
       const createdTodo = await addTodo(trimmedTitle);
 
       setTodos(current => [...current, createdTodo]);
-      setNewTodoTitle('');
+
+      return true;
     } catch {
       setError(Errors.Add);
+
+      return false;
     } finally {
       setTempTodo(null);
     }
@@ -119,8 +120,20 @@ export const App: React.FC = () => {
       completedIds.map(id => deleteTodo(id)),
     );
 
-    const successfullIds = completedIds.filter(
-      (_, i) => results[i].status === 'fulfilled',
+    const { successfullIds } = results.reduce<{
+      successfullIds: number[];
+      rejectedIds: number[];
+    }>(
+      (acc, result, i) => {
+        if (result.status === 'fulfilled') {
+          acc.successfullIds.push(completedIds[i]);
+        } else {
+          acc.rejectedIds.push(completedIds[i]);
+        }
+
+        return acc;
+      },
+      { successfullIds: [], rejectedIds: [] },
     );
 
     if (successfullIds.length > 0) {
@@ -151,8 +164,6 @@ export const App: React.FC = () => {
       <div className="todoapp__content">
         <Header
           handleSubmit={handleSubmit}
-          setNewTodoTitle={setNewTodoTitle}
-          newTodoTitle={newTodoTitle}
           disabled={!!tempTodo}
           inputRef={inputRef}
         />
@@ -242,7 +253,7 @@ export const App: React.FC = () => {
               type="button"
               className="todoapp__clear-completed"
               data-cy="ClearCompletedButton"
-              disabled={!filteredTodos.some(todo => todo.completed)}
+              disabled={!todos.some(todo => todo.completed)}
               onClick={handleDeleteCompleted}
             >
               Clear completed
@@ -255,15 +266,10 @@ export const App: React.FC = () => {
       {/* Add the 'hidden' class to hide the message smoothly */}
       <div
         data-cy="ErrorNotification"
-        className={[
-          'notification',
-          'is-danger',
-          'is-light',
-          'has-text-weight-normal',
-          !error && 'hidden',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+        className={classNames([
+          'notification is-danger is-light has-text-weight-normal',
+          { hidden: !error },
+        ])}
       >
         <button data-cy="HideErrorButton" type="button" className="delete" />
         {error}

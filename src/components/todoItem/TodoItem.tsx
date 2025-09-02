@@ -42,7 +42,7 @@ export const TodoItem: React.FC<Props> = ({ todo, isActive, handleDelete }) => {
 
       <div
         data-cy="TodoLoader"
-        className={classNames('modal', 'overlay', isActive && 'is-active')}
+        className={classNames('modal overlay', { 'is-active': isActive })}
       >
         {/* eslint-disable-next-line max-len */}
         <div className="modal-background has-background-white-ter" />
